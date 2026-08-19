@@ -1,0 +1,15 @@
+name: CustomMine
+version: 1.0.0
+main: com.mcadmin.custommine.CustomMinePlugin
+api-version: "1.21"
+author: TinyAII
+description: 自定义区域矿场 - 区域矿物概率生成 + 掉落倍率 + 定时/挖空刷新
+commands:
+  custommine:
+    description: 自定义区域矿场管理命令
+    aliases: [cm, mine, 矿场, 区域矿场]
+    usage: /矿场 help 查看帮助
+permissions:
+  custommine.admin:
+    description: 自定义区域矿场管理权限
+    default: op
