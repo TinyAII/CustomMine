@@ -1,89 +1,84 @@
-# CustomMine 自定义区域矿场
+# 自定义区域矿场 CustomMine
 
-> 在服务器里圈一块区域，按概率表生成矿物，可自定义掉落倍率，定时/挖空自动刷新。RPG 服务器资源矿场神器。
+> 区域内方块按概率生成 + 掉落倍率 + 定时/挖空刷新 + 随机/固定 seed，零依赖。MIT 开源。
 
-## 功能
+RPG 服"资源矿场"：在指定区域里，按设定的概率表洗出矿物布局，玩家循环挖矿；支持掉落倍率（挖 1 出 N）、定时刷新 / 挖空刷新、随机/固定 seed（固定模式每次刷新布局一致）。
 
-| 功能 | 说明 |
-| --- | --- |
-| 📐 4 种选区方式 | 站立选点 / 木棍圈地 / 直接输坐标 / 中心+半径 |
-| ⚖️ 矿物概率表 | 每个矿场独立配置方块概率（如 石头80% 煤15% 铁5%） |
-| 💎 掉落倍率 | 每方块独立设置掉落数量（默认原版 ×1，上限 1000） |
-| 🔄 定时刷新 / 挖空刷新 | 定时按秒刷新；挖空到阈值自动回填，双模式可开关 |
-| 🎲 随机 / 固定生成 | 默认随机布局；切固定 seed 刷新后布局一致 |
-| 👁️ 区域边界预览 | 粒子画出矿场范围，一眼看清 |
-| ⚡ 性能保护 | 只刷已加载区块，不卡服；刷新把玩家顶出安全区+提示 |
-| 🔥 热重载 | `/矿场 重载` 只重载本插件配置，不卡服 |
+- 📐 **4 种选区方式**：站两点 / 拿选区棒左右键 / 直接输坐标 / 以自身为中心半径
+- 🎲 **方块概率**：每矿场独立的方块概率表（石头 80% / 煤矿 15% / 铁矿 5% ...）
+- ⚒ **掉落倍率（爆率 = 数量倍率）**：默认原版 ×1；设了才生效。例：石头 ×10，挖 1 个石头掉 10 个圆石
+- ⏰ **定时 / 挖空刷新**：每 N 秒刷新 / 剩余 ≤ 阈值 % 自动刷新（可只开一个或都开，默认都关，命令可开关）
+- 🔢 **随机 / 固定 seed**：随机模式每次刷新布局变，固定模式用同一 seed 布局一致（不存整片布局只存 seed，省内存）
+- 👀 **粒子预览**：创建后周围刷粒子让玩家看见矿场范围
+- 🛡 **增量刷新 + 大区域保护 + 挖空保护**：刷新不卡服；>10 万方块大区域跳过挖空检测；刷新瞬间顶起区域内玩家防卡人
+- 🚧 **爆率上限 1000 + 重叠检测警告**：爆率最高 1000；区域重叠时警告但不崩溃（掉落取先建区域）
+- 🎨 品牌横幅 TinyAII；**MIT 开源**
 
-## 命令（仅 OP）
+---
 
-```
-/矿场 点1 / 点2          站立记录两个角
-/矿场 棒                拿木棍选区棒（左键点1 右键点2）
-/矿场 创建 <名字>         用已选区创建（默认全石头）
-/矿场 创建 <名字> <x1 y1 z1> <x2 y2 z2>   坐标创建
-/矿场 创建 <名字> 半径 <r> 以你为中心半径 r
-/矿场 方块 <名字> <方块> <权重>   设矿物概率（如 STONE 80）
-/矿场 爆率 <名字> <方块> <倍率>   设掉落倍率（默认1，上限1000）
-/矿场 定时 <名字> <秒|关>      定时刷新开关
-/矿场 挖空 <名字> <开|关> [阈值%]  挖空自动刷新
-/矿场 模式 <名字> <随机|固定>   刷新模式
-/矿场 刷新 <名字>          立即刷新
-/矿场 预览 <名字>          粒子预览边界
-/矿场 列表 / 信息 / 删除 / 重载
-```
+## 安装
 
-## 快速上手
+1. 下载 `custommine-1.0.0.jar`
+2. 放入 `plugins/`，重启
+3. `/矿场 help` 查看命令
 
-1. `/矿场 点1` → 站对角 `/矿场 点2` → `/矿场 创建 main`
-2. `/矿场 方块 main STONE 80`、`/矿场 方块 main COAL_ORE 15`、`/矿场 方块 main IRON_ORE 5`
-3. `/矿场 爆率 main IRON_ORE 3`（挖1个铁矿石掉3个）
-4. `/矿场 定时 main 3600`（每1小时刷新）
-5. `/矿场 刷新 main` → 看区域按 80/15/5 概率填出矿石
+## 命令
 
-## 配置
+别名：`/矿场`、`/custommine`、`/cm`、`/mine`、`/区域矿场`
 
-矿场数据存 `plugins/CustomMine/data.yml`，手动改后 `/矿场 重载` 热生效。
+| 命令 | 权限 | 说明 |
+|---|---|---|
+| `/矿场 点1` / `/矿场 点2` | OP | 站两个角点记录选区 |
+| `/矿场 棒` | OP | 拿选区棒（左键=点1，右键=点2） |
+| `/矿场 创建 <名字> [x1 y1 z1 x2 y2 z2]` | OP | 创建矿场（不填坐标用点1/点2选区） |
+| `/矿场 创建 <名字> 半径 <r>` | OP | 以自身为中心半径创建 |
+| `/矿场 方块 <名字> <方块> <概率%> [<方块> <概率%>...]` | OP | 设置方块概率表 |
+| `/矿场 爆率 <名字> <方块> <倍率>` | OP | 设置掉落倍率（≤1=原版） |
+| `/矿场 模式 <名字> <随机/固定>` | OP | 切随机/固定 seed |
+| `/矿场 定时 <名字> <秒>/<关>` | OP | 开/关定时刷新 |
+| `/矿场 挖空 <名字> <开/关> [<阈值%>]` | OP | 开/关挖空刷新 |
+| `/矿场 刷新 <名字>` | OP | 立即刷新 |
+| `/矿场 重载` | OP | 重载插件数据（不卡服） |
+| `/矿场 列表` | OP | 列出所有矿场 |
+| `/矿场 信息 <名字>` | OP | 查看矿场详情 |
+| `/矿场 删除 <名字>` | OP | 删除矿场 |
+
+## 配置 / 数据
+
+- 矿场配置存 `plugins/CustomMine/data.yml`，重启不丢。
+- 定时/挖空刷新**默认关闭**，用户主动用 `/矿场 定时` / `/矿场 挖空` 开启。
+
+## 实现原理（开源可读）
+
+- `CustomMinePlugin`：选区 + 区域创建 + 命令分发 + 定时刷新 scheduler + 粒子预览 + 重叠/大区域保护 + 数据存 data.yml
+- `MineRegion`：区域数据结构（方块概率表 + 掉落倍率 + 刷新开关 + seed）；刷新时按概率表洗出布局，固定 seed 用同一随机种子复现布局
+- `MineListener`：拦截区域内 BlockBreakEvent，取消原版掉落按倍率产出 + 触发挖空检测
 
 ## 兼容
 
-- Paper 1.21.8（及 Purpur / Leaves 1.21.8）
-- Java 17+
-- 零依赖，无需 WorldEdit
+- Paper 1.21+（用 `api-version: 1.21`；纯 Bukkit API 支持 1.13+）
+- Java 21
+- 零依赖
 
-## 技术亮点
+## 开源许可
 
-- 增量刷新：只改已加载区块，超大矿场不卡服
-- 粒子边界预览：无 WorldEdit 也能直观选区
-- 坐标重叠检测：创建时警告与已有矿场重叠
+**MIT License** — Copyright (c) 2026 TinyAII。源码见 `src/main/java/com/mcadmin/custommine/`，可自由使用/修改/分发，请保留版权与许可声明。
 
 ---
 
 # CustomMine (English)
 
-Generate custom ore regions: pick a box area, set block probabilities, set drop multipliers, auto-refresh on a timer or when mined empty. Great for RPG servers.
+Region-bounded mine with block probability, drop multiplier, timed/empty refresh, random/fixed seed. MIT open source, zero deps.
 
-## Features
-
-- 4 selection methods: stand points / stick wand / direct coords / center + radius
-- Per-region block probability table (e.g. stone 80%, coal 15%, iron 5%)
-- Per-block drop multiplier (default vanilla ×1, max 1000)
-- Timer refresh / refresh when mined empty (switchable)
-- Random / fixed layout (fixed seed = same layout each refresh)
-- Particle region preview
-- Performance-safe: only refreshes loaded chunks; ejects players + ActionBar notice
-- Hot reload via `/矿场 重载`
-
-## Commands (OP only)
-
-`/矿场 点1` `/矿场 点2` `/矿场 棒` `/矿场 创建` `/矿场 方块` `/矿场 爆率` `/矿场 定时` `/矿场 挖空` `/矿场 模式` `/矿场 刷新` `/矿场 预览` `/矿场 列表/信息/删除/重载`
+## Commands
+Aliases: `/custommine`, `/cm`, `/mine`. All commands under `custommine.admin` permission.
+Key ones: `/矿场 点1|点2`, `/矿场 棒` (wand), `/矿场 创建 <name> [coords|半径 <r>]`, `/矿场 方块 <name> <material> <%>…`, `/矿场 爆率 <name> <material> <×>`, `/矿场 模式 <name> <random|fixed>`, `/矿场 定时 <name> <sec|off>`, `/矿场 挖空 <name> <on|off> [%]`, `/矿场 刷新 <name>`, `/矿场 重载` (reload), `/矿场 列表`, `/矿场 信息 <name>`, `/矿场 删除 <name>`.
 
 ## Compatibility
+Paper 1.21+, Java 21, zero dependencies
 
-- Paper 1.21.8 (Purpur / Leaves 1.21.8)
-- Java 17+
-- Zero dependencies, no WorldEdit required
+## License
+**MIT** — Copyright (c) 2026 TinyAII. Source in `src/`. Free to use/modify/distribute; keep the copyright notice.
 
 ## Author
-
-TinyAII · 免费开源 · 零依赖
+TinyAII · MIT 开源 · 零依赖
