@@ -56,8 +56,8 @@ RPG 服"资源矿场"：在指定区域里，按设定的概率表洗出矿物�
 
 ## 兼容
 
-- Paper 1.21+（用 `api-version: 1.21`；纯 Bukkit API 支持 1.13+）
-- Java 21
+- Paper / Spigot / Purpur / Leaves **1.16 ~ 26.2 全系**（spigot-api 1.16.5 编译 + `api-version: 1.16`，纯标准 Bukkit API）
+- Java 17+
 - 零依赖
 
 ## 开源许可
